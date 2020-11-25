@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ThemeProps } from '../types';
+import { IconTheme } from '@polkadot/react-identicon/types';
 
 import React from 'react';
 import styled from 'styled-components';
@@ -9,7 +10,7 @@ import Icon from '@polkadot/react-identicon';
 
 interface Props {
   className?: string;
-  iconTheme?: 'beachball' | 'empty' | 'jdenticon' | 'polkadot' | 'substrate';
+  iconTheme: IconTheme;
   isExternal?: boolean | null;
   onCopy?: () => void;
   prefix?: number;

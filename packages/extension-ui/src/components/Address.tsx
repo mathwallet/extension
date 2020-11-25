@@ -3,6 +3,7 @@
 
 import { AccountJson, AccountWithChildren } from '@polkadot/extension-base/background/types';
 import { Chain } from '@polkadot/extension-chains/types';
+import { IconTheme } from '@polkadot/react-identicon/types';
 import { SettingsStruct } from '@polkadot/ui-settings/types';
 import { ThemeProps } from '../types';
 
@@ -109,7 +110,7 @@ function Address ({ actions, address, children, className, genesisHash, isExtern
     setShowActionsMenu(false);
   }, [toggleActions]);
 
-  const theme = ((chain && chain.icon) || 'polkadot') as 'polkadot';
+  const theme = ((chain && chain.icon) || 'polkadot') as IconTheme;
   const _onClick = useCallback((): void => setShowActionsMenu(!showActionsMenu), [showActionsMenu]);
   const _onCopy = useCallback((): void => show(t('Copied')), [show, t]);
   const _toggleVisibility = useCallback(

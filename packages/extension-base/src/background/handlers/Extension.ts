@@ -313,7 +313,7 @@ export default class Extension {
 
     // unlike queued.account.address the following
     // address is encoded with the default prefix
-    // which what is used for password caching mapping
+    // which is what is used for password caching mapping
     const { address } = pair;
 
     if (!pair) {
