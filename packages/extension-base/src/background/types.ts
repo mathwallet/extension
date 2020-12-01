@@ -85,7 +85,7 @@ export interface RequestSignatures {
   'pri(derivation.create)': [RequestDeriveCreate, boolean];
   'pri(derivation.validate)': [RequestDeriveValidate, ResponseDeriveValidate];
   'pri(json.restore)': [RequestJsonRestore, ResponseJsonRestore];
-  'pri(json.verify.file)': [RequestJsonRestore, boolean];
+  'pri(json.get.pair)': [KeyringPair$Json, KeyringPair];
   'pri(json.verify.password)': [string, boolean];
   'pri(metadata.approve)': [RequestMetadataApprove, boolean];
   'pri(metadata.get)': [string | null, MetadataDef | null];
@@ -347,8 +347,12 @@ export interface RequestSign {
   sign (registry: TypeRegistry, pair: KeyringPair): { signature: string };
 }
 
+export interface RequestJsonGetPair {
+  file: KeyringPair$Json;
+}
+
 export interface RequestJsonRestore {
-  json: KeyringPair$Json;
+  pair: KeyringPair$Json;
   password: string;
 }
 

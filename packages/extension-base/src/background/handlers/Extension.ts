@@ -3,15 +3,15 @@
 
 import { MetadataDef } from '@polkadot/extension-inject/types';
 import { SubjectInfo } from '@polkadot/ui-keyring/observable/types';
-import { AccountJson, AllowedPath, AuthorizeRequest, MessageTypes, MetadataRequest, RequestAccountChangePassword, RequestAccountCreateExternal, RequestAccountCreateSuri, RequestAccountEdit, RequestAccountExport, RequestAccountShow, RequestAccountTie, RequestAccountValidate, RequestAuthorizeApprove, RequestAuthorizeReject, RequestDeriveCreate, ResponseDeriveValidate, RequestMetadataApprove, RequestMetadataReject, RequestSigningApprovePassword, RequestSigningApproveSignature, RequestSigningCancel, RequestSigningIsLocked, RequestSeedCreate, RequestTypes, ResponseAccountExport, RequestAccountForget, ResponseSeedCreate, RequestSeedValidate, RequestDeriveValidate, RequestJsonRestore, ResponseJsonRestore, ResponseSeedValidate, ResponseSigningIsLocked, ResponseType, SigningRequest } from '../types';
+import { AccountJson, AllowedPath, AuthorizeRequest, MessageTypes, MetadataRequest, RequestAccountChangePassword, RequestAccountCreateExternal, RequestAccountCreateSuri, RequestAccountEdit, RequestAccountExport, RequestAccountShow, RequestAccountTie, RequestAccountValidate, RequestAuthorizeApprove, RequestAuthorizeReject, RequestDeriveCreate, RequestJsonGetPair, ResponseDeriveValidate, RequestMetadataApprove, RequestMetadataReject, RequestSigningApprovePassword, RequestSigningApproveSignature, RequestSigningCancel, RequestSigningIsLocked, RequestSeedCreate, RequestTypes, ResponseAccountExport, RequestAccountForget, ResponseSeedCreate, RequestSeedValidate, RequestDeriveValidate, RequestJsonRestore, ResponseJsonRestore, ResponseSeedValidate, ResponseSigningIsLocked, ResponseType, SigningRequest } from '../types';
 
 import { ALLOWED_PATH, PASSWORD_EXPIRY_MS } from '@polkadot/extension-base/defaults';
 import chrome from '@polkadot/extension-inject/chrome';
 import keyring from '@polkadot/ui-keyring';
 import accountsObservable from '@polkadot/ui-keyring/observable/accounts';
 import { TypeRegistry } from '@polkadot/types';
-import { KeyringPair, KeyringPair$Meta } from '@polkadot/keyring/types';
-import { assert, isHex, isObject } from '@polkadot/util';
+import { KeyringPair, KeyringPair$Json, KeyringPair$Meta } from '@polkadot/keyring/types';
+import { assert, isHex } from '@polkadot/util';
 import { keyExtractSuri, mnemonicGenerate, mnemonicValidate } from '@polkadot/util-crypto';
 
 import State from './State';
@@ -242,40 +242,54 @@ export default class Extension {
     return true;
   }
 
-  private jsonRestore ({ json, password }: RequestJsonRestore): ResponseJsonRestore {
+  private jsonRestore ({ file, password }: RequestJsonRestore): ResponseJsonRestore {
     try {
-      const pair = keyring.restoreAccount(json, password);
+      const sec = keyring.createFromJson(file);
 
-      if (pair) {
-        return { error: null };
-      }
+      console.log('sec', sec);
+      keyring.addPair(sec, password);
+
+      return { error: null };
     } catch (error) {
+      console.error(error);
+
       return { error: (error as Error).message };
     }
-
-    return { error: 'Could not restore account.' };
   }
 
-  private jsonVerifyFile ({ json }: RequestJsonRestore): boolean {
-    try {
-      const publicKey = keyring.decodeAddress(json.address, true);
-      const isFileValid = publicKey.length === 32 && !!json.encoded && isObject(json.meta) && (
-        Array.isArray(json.encoding.content)
-          ? json.encoding.content[0] === 'pkcs8'
-          : json.encoding.content === 'pkcs8'
-      );
+  // private jsonVerifyFile ({ json }: RequestVerifyFile): boolean {
+  //   try {
+  //     const publicKey = keyring.decodeAddress(json.address, true);
 
-      return isFileValid;
+  //     // ethereum key is 33, substrate 32
+  //     const hasExpectedLength = publicKey.length === 32 || publicKey.length === 33;
+  //     const isFileValid = hasExpectedLength && !!json.encoded && isObject(json.meta) && (
+  //       Array.isArray(json.encoding.content)
+  //         ? json.encoding.content[0] === 'pkcs8'
+  //         : json.encoding.content === 'pkcs8'
+  //     );
+
+  //     return isFileValid;
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+
+  //   return false;
+  // }
+
+  private jsonGetPairFromFile (file : KeyringPair$Json): KeyringPair | null {
+    try {
+      return keyring.createFromJson(file);
     } catch (error) {
       console.error(error);
     }
 
-    return false;
+    return null;
   }
 
-  private jsonVerifyPassword (password: string): boolean {
-    return keyring.isPassValid(password);
-  }
+  // private jsonVerifyPassword (password: string): boolean {
+  //   return keyring.isPassValid(password);
+  // }
 
   private seedCreate ({ length = SEED_DEFAULT_LENGTH, type }: RequestSeedCreate): ResponseSeedCreate {
     const seed = mnemonicGenerate(length);
@@ -523,14 +537,14 @@ export default class Extension {
       case 'pri(derivation.validate)':
         return this.derivationValidate(request as RequestDeriveValidate);
 
+      case 'pri(json.get.pair)':
+        return this.jsonGetPairFromFile(request as KeyringPair$Json);
+
       case 'pri(json.restore)':
         return this.jsonRestore(request as RequestJsonRestore);
 
-      case 'pri(json.verify.file)':
-        return this.jsonVerifyFile(request as RequestJsonRestore);
-
-      case 'pri(json.verify.password)':
-        return this.jsonVerifyPassword(request as string);
+        // case 'pri(json.verify.password)':
+        //   return this.jsonVerifyPassword(request as string);
 
       case 'pri(seed.create)':
         return this.seedCreate(request as RequestSeedCreate);

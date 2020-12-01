@@ -11,7 +11,7 @@ import { PORT_EXTENSION } from '@polkadot/extension-base/defaults';
 import allChains from '@polkadot/extension-chains/chains';
 import { metadataExpand } from '@polkadot/extension-chains';
 import chrome from '@polkadot/extension-inject/chrome';
-import { KeyringPair$Json } from '@polkadot/keyring/types';
+import { KeyringPair, KeyringPair$Json } from '@polkadot/keyring/types';
 
 interface Handler {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -198,14 +198,14 @@ export async function windowOpen (path: AllowedPath): Promise<boolean> {
   return sendMessage('pri(window.open)', path);
 }
 
-export async function jsonVerifyFile (json: KeyringPair$Json): Promise<boolean> {
-  return sendMessage('pri(json.verify.file)', { json, password: '' });
+export async function jsonGetPairFromFile (file: KeyringPair$Json): Promise<KeyringPair> {
+  return sendMessage('pri(json.get.pair)', file);
 }
 
-export async function jsonVerifyPassword (password: string): Promise<boolean> {
-  return sendMessage('pri(json.verify.password)', password);
-}
+// export async function jsonVerifyPassword (password: string): Promise<boolean> {
+//   return sendMessage('pri(json.verify.password)', password);
+// }
 
-export async function jsonRestore (json: KeyringPair$Json, password: string): Promise<ResponseJsonRestore> {
-  return sendMessage('pri(json.restore)', { json, password });
+export async function jsonRestore (file: KeyringPair$Json, password: string): Promise<ResponseJsonRestore> {
+  return sendMessage('pri(json.restore)', { file, password });
 }

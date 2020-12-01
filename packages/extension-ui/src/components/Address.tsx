@@ -33,6 +33,7 @@ interface Props {
   children?: React.ReactNode;
   className?: string;
   genesisHash?: string | null;
+  isEthereum?: boolean;
   isExternal?: boolean | null;
   isHidden?: boolean;
   name?: React.ReactNode | null;
@@ -75,7 +76,7 @@ function recodeAddress (address: string, accounts: AccountWithChildren[], chain:
 
 const ACCOUNTS_SCREEN_HEIGHT = 550;
 
-function Address ({ actions, address, children, className, genesisHash, isExternal, isHidden, name, parentName, suri, toggleActions }: Props): React.ReactElement<Props> {
+function Address ({ actions, address, children, className, genesisHash, isEthereum, isExternal, isHidden, name, parentName, suri, toggleActions }: Props): React.ReactElement<Props> {
   const { t } = useTranslation();
   const { accounts } = useContext(AccountContext);
   const settings = useContext(SettingsContext);
@@ -110,7 +111,9 @@ function Address ({ actions, address, children, className, genesisHash, isExtern
     setShowActionsMenu(false);
   }, [toggleActions]);
 
-  const theme = ((chain && chain.icon) || 'polkadot') as IconTheme;
+  const theme = (isEthereum
+    ? 'ethereum'
+    : (chain && chain.icon) || 'polkadot') as IconTheme;
   const _onClick = useCallback((): void => setShowActionsMenu(!showActionsMenu), [showActionsMenu]);
   const _onCopy = useCallback((): void => show(t('Copied')), [show, t]);
   const _toggleVisibility = useCallback(
@@ -320,6 +323,11 @@ export default styled(Address)(({ theme }: ThemeProps) => `
     align-items: center;
     height: 72px;
     border-radius: 4px;
+
+    img {
+      max-width: 50px;
+      max-height: 50px;
+    }
   }
 
   .name {
