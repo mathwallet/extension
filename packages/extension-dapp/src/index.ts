@@ -179,7 +179,7 @@ export async function web3FromSource (source: string): Promise<InjectedExtension
 }
 
 // find a specific provider based on an address
-export async function web3FromAddress (address: string): Promise<InjectedExtension> {
+export async function web3FromAddress (address: string, { ss58Format }: Web3AccountsOptions = {}): Promise<InjectedExtension> {
   if (!web3EnablePromise) {
     return throwError('web3FromAddress');
   }
