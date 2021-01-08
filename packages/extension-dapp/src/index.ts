@@ -5,6 +5,7 @@ import type { Injected, InjectedAccount, InjectedAccountWithMeta, InjectedExtens
 
 import { u8aEq } from '@polkadot/util';
 import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
+import { u8aEq } from '@polkadot/util';
 
 import { documentReadyPromise } from './util';
 
@@ -179,7 +180,7 @@ export async function web3FromSource (source: string): Promise<InjectedExtension
 }
 
 // find a specific provider based on an address
-export async function web3FromAddress (address: string, { ss58Format }: Web3AccountsOptions = {}): Promise<InjectedExtension> {
+export async function web3FromAddress (address: string): Promise<InjectedExtension> {
   if (!web3EnablePromise) {
     return throwError('web3FromAddress');
   }
