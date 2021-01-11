@@ -5,6 +5,7 @@ import type { Injected, InjectedAccount, InjectedAccountWithMeta, InjectedExtens
 
 import { u8aEq } from '@polkadot/util';
 import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
+
 import { u8aEq } from '@polkadot/util';
 
 import { documentReadyPromise } from './util';
